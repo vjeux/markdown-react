@@ -1,0 +1,59 @@
+<script src="http://fb.me/react-with-addons-0.11.1.js"></script>
+<script src="http://fb.me/JSXTransformer-0.11.1.js"></script>
+<script src="http://jgm.github.io/stmd/js/stmd.js"></script>
+<script src="stdm-react.js"></script>
+
+<div id="demo"></div>
+
+<style>
+.result { background-color: #ccc; }
+.html, .result { margin-left: 20px; }
+</style>
+
+<script type="text/jsx;harmony">
+/** @jsx React.DOM */
+
+var parser = new stmd.DocParser();
+var reactRenderer = new stmdReact.ReactRenderer();
+var htmlRenderer = new stmd.HtmlRenderer();
+
+var Demo = React.createClass({
+  mixins: [React.addons.LinkedStateMixin],
+  getInitialState: function() {
+    return {value: 'Hello *world*'};
+  },
+  render: function() {
+    var ast = parser.parse(this.state.value);
+    var result = reactRenderer.render(ast);
+
+    var html = React.renderComponentToStaticMarkup(<div>{result}</div>);
+    html = html.substring('<div>'.length, html.length - '</div>'.length);
+
+    var markdown = htmlRenderer.render(ast);
+
+    return (
+      <div>
+        <textarea valueLink={this.linkState('value')} /><br />
+        React Rendered:
+        <div className="result">{result}</div>
+
+        Markdown Rendered:
+        <div
+          className="result"
+          dangerouslySetInnerHTML={{
+            __html: markdown
+          }}
+        />
+
+        React HTML:
+        <div className="html">{html}</div>
+
+        Markdown HTML:
+        <div className="html">{markdown}</div>
+      </div>
+    );
+  }
+});
+
+React.renderComponent(<Demo />, document.getElementById('demo'));
+</script>
